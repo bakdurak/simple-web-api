@@ -1,0 +1,11 @@
+1. Models:
+    a) On add new method it name will be methodNameV( latest version )
+    b) On change old method it name will be methodNameV( latest version + 1 )
+2. Routes:
+    a) On add new end point it add in 'Vx' folder where x - latest version
+    b) On change old method create folder 'Vx' where x - ( latest version + 1 )
+3. Middleware:
+    a) On add new - same as in routes
+    b) On change old - same as in routes
+4. Utils:
+    Same as in middleware

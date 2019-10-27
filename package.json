@@ -1,0 +1,43 @@
+{
+  "name": "mini-football-team-search",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha --timeout 10000"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.3",
+    "body-parser": "*",
+    "connect-mongo": "^2.0.3",
+    "cookie-parser": "*",
+    "dotenv": "^6.2.0",
+    "ejs": "*",
+    "express": "^4.16.4",
+    "express-async-handler": "*",
+    "express-session": "*",
+    "helmet": "^3.15.0",
+    "md5": "^2.2.1",
+    "mkdirp": "^0.5.1",
+    "mongoose": "^5.4.5",
+    "multer": "^1.4.1",
+    "passport": "*",
+    "passport-local": "*",
+    "pify": "^4.0.1",
+    "qs": "^6.6.0",
+    "rimraf": "^2.6.3",
+    "sharp": "^0.22.0",
+    "validator": "^10.11.0",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^3.10.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "mocha": "^6.1.2",
+    "mongodb": "^3.2.7"
+  }
+}
