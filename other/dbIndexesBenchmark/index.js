@@ -23,8 +23,9 @@ database()
     await eventBenchmark( dbInterface.db );
     dbInterface.client.close();
   } )
-  .catch( () =>
+  .catch( ( e ) =>
   {
+    console.log( e );
     console.error( 'Unable to connect to database' );
     process.exit( 1 );
   } );

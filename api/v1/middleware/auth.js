@@ -7,7 +7,7 @@ async function auth ( email, password, done )
 {
   try
   {
-    const user = await User.findOne( { email }, { email: 1, passwordHash: 1 } );
+    const user = await User.findOne( { email: { $eq: email } }, { email: 1, passwordHash: 1 } );
     const message = 'Such email does not exist or password is invalid';
     if ( ! user )
     {
