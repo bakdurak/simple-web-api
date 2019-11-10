@@ -6,7 +6,7 @@ const Users = require( '../../models/users' );
 
 router.get( '/:id', asyncHandler( async ( req, res ) =>
 {
-  const user = await Users.findOne( { _id: req.params.id } )
+  const user = await Users.findOne( { _id: { $eq: req.params.id } } )
     .select( { email: 0, passwordHash: 0 } );
 
   res.json( user );

@@ -41,7 +41,7 @@ uploadSchema.statics.loadAvatarV1 = async function  ( req, res )
       .id;
 
     // Update user avatar
-    let oldAvatarId = ( await User.findOneAndUpdate( { _id: req.session.userId },
+    let oldAvatarId = ( await User.findOneAndUpdate( { _id: { $eq: req.session.userId } },
       { $set: { avatar: newImageId }  },
       { session } ).select( { avatar: 1, _id: 0 } ) )
       .avatar;

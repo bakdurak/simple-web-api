@@ -165,7 +165,7 @@ eventSchema.statics.createV1 = async function ( req, res )
     res.locals.createdEventId = createdEventId;
 
     // Insert recent created eventId into user's ownEvent array
-    const userFilter = { _id: req.session.userId, $expr: { $lt: [ { $size: '$ownEvents' },
+    const userFilter = { _id: { $eq: req.session.userId }, $expr: { $lt: [ { $size: '$ownEvents' },
       config.event.MAX_CREATED_EVENTS_PER_USER ] } };
     const userUpdate = { $push: { ownEvents: createdEventId } };
     const userOpts = { session, projection: { _id: 1 } };
@@ -307,9 +307,9 @@ eventSchema.statics.createMemberV1 = async function ( req )
     if ( req.body.role === 'goalkeepers' )
     {
       eventFilter = {
-        _id: req.params.id,
-        'userSubscriptions.participant': req.body.uid,  // Clause 3
-        host: req.session.userId,                       // Clause 1
+        _id: { $eq: req.params.id },
+        'userSubscriptions.participant': { $eq: req.body.uid },  // Clause 3
+        host: { $eq: req.session.userId },                       // Clause 1
         $expr: {                                        // Clause 4
           $lt: [ '$goalkeepersCnt', goalkeepersMaxCnt ]
         }
@@ -322,9 +322,9 @@ eventSchema.statics.createMemberV1 = async function ( req )
     else
     {
       eventFilter = {
-        _id: req.params.id,
+        _id: { $eq: req.params.id },
         'userSubscriptions.participant': req.body.uid,  // Clause 3
-        host: req.session.userId,                       // Clause 1
+        host: { $eq: req.session.userId },                       // Clause 1
         $expr: {                                        // Clause 4
           $lt: [ '$fieldPlayersCnt', '$fieldPlayersCountMax' ]
         }
@@ -359,7 +359,7 @@ eventSchema.statics.createMemberV1 = async function ( req )
 
     // Update User
     const userFilter = {
-      _id: req.body.uid,
+      _id: { $eq: req.body.uid },
       $expr: { $lt: [ { $size: '$events' }, config.event.MAX_EVENT_PER_USER ] } // Clause 2
     };
     const userUpdate = { $pull: { eventSubscriptions: req.params.id },
@@ -386,14 +386,14 @@ eventSchema.statics.leaveMembersV1 = async function ( req )
     // Host can't leave
     if ( req.body.role === 'goalkeepers' )
     {
-      eventFilter = { _id: req.params.id, goalkeepers: req.session.userId,
+      eventFilter = { _id: { $eq: req.params.id }, goalkeepers: { $eq: req.session.userId },
         host: { $ne: req.session.userId }  };
       eventUpdate =  { $pull: { goalkeepers: req.session.userId  },
         $inc: { curMemberCnt: -1, goalkeepersCnt: -1 } };
     }
     else
     {
-      eventFilter = { _id: req.params.id, fieldPlayers: req.session.userId,
+      eventFilter = { _id: { $eq: req.params.id }, fieldPlayers: { $eq: req.session.userId },
         host: { $ne: req.session.userId }  };
       eventUpdate =  { $pull: { fieldPlayers: req.session.userId  },
         $inc: { curMemberCnt: -1, fieldPlayersCnt: -1 } };
@@ -407,7 +407,7 @@ eventSchema.statics.leaveMembersV1 = async function ( req )
         config.errorLevels.warn );
     }
 
-    const userFilter = { _id: req.session.userId };
+    const userFilter = { _id: { $eq: req.session.userId } };
     const userUpdate = { $pull: { events: req.params.id } };
     await User.updateOne( userFilter, userUpdate, { session } );
   };
@@ -434,13 +434,15 @@ eventSchema.statics.kickMemberV1 = async function ( req )
     let eventUpdate;
     if ( req.body.role === 'goalkeepers' )
     {
-      eventFilter = { _id: req.params.id, goalkeepers: req.body.uid, host: req.session.userId };
+      eventFilter = { _id: { $eq: req.params.id }, goalkeepers: { $eq: req.body.uid },
+        host: { $eq: req.session.userId } };
       eventUpdate =  { $pull: { goalkeepers: req.body.uid },
         $inc: { curMemberCnt: -1, goalkeepersCnt: -1 } };
     }
     else
     {
-      eventFilter = { _id: req.params.id, fieldPlayers: req.body.uid, host: req.session.userId };
+      eventFilter = { _id: { $eq: req.params.id }, fieldPlayers: { $eq: req.body.uid },
+        host: { $eq: req.session.userId } };
       eventUpdate =  { $pull: { fieldPlayers: req.body.uid },
         $inc: { curMemberCnt: -1, fieldPlayersCnt: -1 } };
     }
@@ -452,7 +454,7 @@ eventSchema.statics.kickMemberV1 = async function ( req )
       throw new BusinessRuleException( 400, 'Player not found', config.errorLevels.info );
     }
 
-    const userFilter = { _id: req.body.uid };
+    const userFilter = { _id: { $eq: req.body.uid } };
     const userUpdate = { $pull: { events: req.params.id } };
     await User.updateOne( userFilter, userUpdate, { session } );
   };
@@ -468,7 +470,7 @@ eventSchema.statics.createSubscriptionV1 = async function  ( req )
     if ( req.body.role === 'goalkeepers' ) role = 'goalkeepers';
     else role = 'fieldPlayers';
 
-    const eventFilter = { _id: req.params.id,
+    const eventFilter = { _id: { $eq: req.params.id },
       // eslint-disable-next-line max-len
       $expr: { $lt: [ { $size: '$userSubscriptions' }, config.event.MAX_USER_PER_EVENT_SUBSCRIPTIONS_CNT ] },
       'userSubscriptions.participant': { $ne: req.session.userId },
@@ -479,7 +481,7 @@ eventSchema.statics.createSubscriptionV1 = async function  ( req )
     const eventOpts = { session, projection: { _id: 1 } };
 
     const userFilter = {
-      _id: req.session.userId,
+      _id: { $eq: req.session.userId },
       $expr: {
         $and: [
           // eslint-disable-next-line max-len
@@ -515,10 +517,10 @@ eventSchema.statics.leaveSubscribersV1 = async function  ( req )
 {
   const leaveSubscribersCallback = async ( session ) =>
   {
-    const eventFilter = { _id: req.params.id };
+    const eventFilter = { _id: { $eq: req.params.id } };
     const eventUpdate =  { $pull: { userSubscriptions: { participant: req.session.userId } } };
 
-    const userFilter = { _id: req.session.userId };
+    const userFilter = { _id: { $eq: req.session.userId } };
     const userUpdate = { $pull: { eventSubscriptions: req.params.id } };
 
     await this.updateOne( eventFilter, eventUpdate, { session } );
@@ -532,11 +534,11 @@ eventSchema.statics.kickSubscribersV1 = async function  ( req )
 {
   const kickSubscribersCallback = async ( session ) =>
   {
-    const eventFilter = { _id: req.params.id, host: req.session.userId };
+    const eventFilter = { _id: { $eq: req.params.id }, host: { $eq: req.session.userId } };
     const eventUpdate =  { $pull: { userSubscriptions: { participant: req.body.uid } } };
     const eventOpts = { session, projection: { _id: 1 } };
 
-    const userFilter = { _id: req.body.uid };
+    const userFilter = { _id: { $eq: req.body.uid } };
     const userUpdate = { $pull: { eventSubscriptions: req.params.id } };
 
     const isHost = await this.findOneAndUpdate( eventFilter, eventUpdate, eventOpts );
