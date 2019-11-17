@@ -1,7 +1,7 @@
 const config = require( '../../../config' );
 const BusinessRuleException = require( '../../versionIndependentUtils/BusinessRuleException' );
 const mongoose = require( 'mongoose' );
-const logger = require( '../../../logger' );
+const logger = require( '../../versionIndependentUtils/logger' );
 require( 'dotenv' ).config();
 
 const txnCommitCntExceeded = 'Transaction commit retry is exceeded';
