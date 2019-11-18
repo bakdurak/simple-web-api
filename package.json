@@ -1,10 +1,11 @@
 {
-  "name": "mini-football-team-search",
+  "name": "simple-web-api",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
+    "mongo:start": "node ./api/tasks/launchMongoCluster/index.js",
     "start": "node index.js",
-    "test": "mocha --timeout 10000"
+    "dev": "(start npm run mongo:start && sleep 6 && start npm run start) || (npm run mongo:start & sleep 6 & npm run start)",
+    "test": "mocha --timeout 10000 test/unit/*.js test/api/v1/*.js"
   },
   "dependencies": {
     "bcrypt": "^3.0.3",
